@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Porovnání zákonů o finanční kontrole</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --old: #8B1A1A;
+    --old-light: #C0392B;
+    --old-bg: #FDF0F0;
+    --new: #1A3A5C;
+    --new-light: #2980B9;
+    --new-bg: #F0F5FA;
+    --gold: #C9A84C;
+    --dark: #1A1A2E;
+    --mid: #3D3D5C;
+    --light: #F7F5F0;
+    --white: #FFFFFF;
+    --border: #DDD8CC;
+    --text: #2C2C3E;
+    --text-light: #6B6B85;
+    --shadow: 0 8px 40px rgba(26,26,46,0.12);
+    --radius: 16px;
+    --slide-w: 100%;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .wrapper {
+    width: 100%;
+    max-width: 960px;
+    position: relative;
+  }
+
+  /* === PROGRESS BAR === */
+  .progress-container {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .progress-label {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #9090AA;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  .progress-track {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    position: relative;
+    overflow: visible;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), #E8C97A);
+    border-radius: 4px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+
+  .progress-dots {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .p-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: 2px solid rgba(255,255,255,0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    pointer-events: all;
+    position: relative;
+  }
+
+  .p-dot.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 8px rgba(201,168,76,0.6);
+  }
+
+  .p-dot.visited {
+    background: rgba(201,168,76,0.4);
+    border-color: rgba(201,168,76,0.4);
+  }
+
+  .progress-count {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    color: var(--gold);
+    white-space: nowrap;
+    font-style: italic;
+  }
+
+  /* === SLIDES === */
+  .slides-viewport {
+    overflow: hidden;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow), 0 0 0 1px rgba(255,255,255,0.06);
+  }
+
+  .slides-track {
+    display: flex;
+    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .slide {
+    min-width: 100%;
+    background: var(--white);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* === SLIDE: COVER === */
+  .slide-cover {
+    background: var(--dark);
+    min-height: 520px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px;
+    position: relative;
+  }
+
+  .slide-cover::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(135deg, transparent 40%, rgba(201,168,76,0.06) 100%);
+  }
+
+  .slide-cover::after {
+    content: '';
+    position: absolute;
+    bottom: -80px;
+    right: -80px;
+    width: 360px;
+    height: 360px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.12);
+  }
+
+  .cover-tag {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 24px;
+  }
+
+  .cover-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.15;
+    margin-bottom: 16px;
+    max-width: 600px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cover-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .cover-sub {
+    font-size: 16px;
+    color: #8888AA;
+    line-height: 1.6;
+    max-width: 500px;
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .laws-badge-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+
+  .law-badge {
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .law-badge.old {
+    background: rgba(139,26,26,0.25);
+    color: #E8958E;
+    border: 1px solid rgba(139,26,26,0.4);
+  }
+
+  .law-badge.new {
+    background: rgba(26,58,92,0.4);
+    color: #7DB8E0;
+    border: 1px solid rgba(26,58,92,0.6);
+  }
+
+  .badge-year {
+    display: block;
+    font-size: 11px;
+    font-weight: 300;
+    opacity: 0.7;
+    margin-top: 2px;
+  }
+
+  /* === SLIDE: TOC === */
+  .slide-toc {
+    min-height: 520px;
+    padding: 48px 56px;
+    background: var(--light);
+  }
+
+  .slide-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 36px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .slide-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--gold);
+    opacity: 0.3;
+    line-height: 1;
+  }
+
+  .slide-title-wrap {}
+
+  .slide-kicker {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 4px;
+  }
+
+  .slide-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.2;
+  }
+
+  .toc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  .toc-item:hover {
+    border-color: var(--gold);
+    box-shadow: 0 4px 16px rgba(201,168,76,0.15);
+    transform: translateY(-1px);
+  }
+
+  .toc-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--dark);
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .toc-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  /* === SLIDE: COMPARISON === */
+  .slide-comparison {
+    min-height: 520px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .comp-header {
+    padding: 32px 48px 28px;
+    background: var(--dark);
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+
+  .comp-body {
+    flex: 1;
+    padding: 32px 48px;
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .comp-intro {
+    font-size: 15px;
+    color: var(--text-light);
+    line-height: 1.6;
+    padding: 16px 20px;
+    background: var(--light);
+    border-radius: 10px;
+    border-left: 3px solid var(--gold);
+  }
+
+  .comp-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .comp-col {
+    padding: 20px;
+    border-radius: 12px;
+    position: relative;
+  }
+
+  .comp-col.old-col {
+    background: var(--old-bg);
+    border: 1px solid rgba(139,26,26,0.15);
+  }
+
+  .comp-col.new-col {
+    background: var(--new-bg);
+    border: 1px solid rgba(26,58,92,0.15);
+  }
+
+  .col-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .col-label.old { color: var(--old); }
+  .col-label.new { color: var(--new-light); }
+
+  .col-label::before {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 2px;
+    border-radius: 2px;
+  }
+
+  .col-label.old::before { background: var(--old); }
+  .col-label.new::before { background: var(--new-light); }
+
+  .col-content {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.65;
+  }
+
+  .col-content ul {
+    padding-left: 0;
+    list-style: none;
+  }
+
+  .col-content li {
+    padding: 5px 0 5px 18px;
+    position: relative;
+    font-size: 13.5px;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+
+  .col-content li:last-child { border-bottom: none; }
+
+  .col-content li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .old-col .col-content li::before { color: var(--old-light); }
+  .new-col .col-content li::before { color: var(--new-light); }
+
+  .change-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .badge-new { background: rgba(26,58,92,0.12); color: var(--new-light); }
+  .badge-changed { background: rgba(201,168,76,0.15); color: #996E00; }
+  .badge-removed { background: rgba(139,26,26,0.1); color: var(--old); }
+
+  .arrow-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 0;
+    color: var(--gold);
+    font-size: 22px;
+    opacity: 0.5;
+  }
+
+  /* Highlights / key points */
+  .highlights {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .highlight-box {
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--new-bg), rgba(41,128,185,0.06));
+    border: 1px solid rgba(26,58,92,0.12);
+    text-align: center;
+  }
+
+  .hl-icon { font-size: 22px; margin-bottom: 6px; }
+  .hl-text { font-size: 12px; font-weight: 600; color: var(--new); line-height: 1.3; }
+
+  /* === NAVIGATION === */
+  .nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding: 0 4px;
+  }
+
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+    color: #CCC;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.3px;
+  }
+
+  .nav-btn:hover:not(:disabled) {
+    background: rgba(255,255,255,0.12);
+    color: var(--white);
+    border-color: rgba(255,255,255,0.25);
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .nav-btn.primary {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--dark);
+  }
+
+  .nav-btn.primary:hover:not(:disabled) {
+    background: #D4B462;
+    border-color: #D4B462;
+    color: var(--dark);
+  }
+
+  .nav-arrow { font-size: 16px; }
+
+  /* Section tag on comp slides */
+  .section-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background: rgba(201,168,76,0.18);
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  .comp-header .slide-title {
+    color: var(--white);
+    font-size: 22px;
+  }
+
+  .comp-header .slide-kicker {
+    color: #7070AA;
+  }
+
+  .comp-header .slide-num {
+    opacity: 0.2;
+    color: var(--gold);
+  }
+
+  /* Tooltips on dots */
+  .p-dot:hover::after {
+    content: attr(data-title);
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark);
+    color: var(--white);
+    font-size: 11px;
+    white-space: nowrap;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  @media (max-width: 640px) {
+    .slide-cover, .slide-toc, .comp-body { padding: 28px 24px; }
+    .comp-header { padding: 24px 24px 20px; }
+    .comp-row { grid-template-columns: 1fr; }
+    .toc-grid { grid-template-columns: 1fr; }
+    .highlights { grid-template-columns: 1fr 1fr; }
+    .cover-title { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- Progress bar -->
+  <div class="progress-container">
+    <span class="progress-label">Průběh</span>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+      <div class="progress-dots" id="progressDots"></div>
+    </div>
+    <span class="progress-count" id="progressCount">1 / 11</span>
+  </div>
+
+  <!-- Slides viewport -->
+  <div class="slides-viewport">
+    <div class="slides-track" id="slidesTrack">
+
+      <!-- ============ SLIDE 0: COVER ============ -->
+      <div class="slide slide-cover">
+        <div class="cover-tag">Analýza legislativních změn · 2025</div>
+        <h1 class="cover-title">Finanční kontrola ve veřejné správě — <em>co se mění?</em></h1>
+        <p class="cover-sub">Přehledné porovnání starého a nového zákona. Kde jsou podstatné rozdíly, co zůstává a co zcela mizí.</p>
+        <div class="laws-badge-row">
+          <div class="law-badge old">
+            Zákon č. 320/2001 Sb.
+            <span class="badge-year">Zákon o finanční kontrole · platný do 2026</span>
+          </div>
+          <div class="law-badge new">
+            Zákon č. 231/2025 Sb.
+            <span class="badge-year">Zákon o řízení a kontrole VF · účinný od 1. 1. 2027</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ SLIDE 1: TOC ============ -->
+      <div class="slide slide-toc">
+        <div class="slide-header">
+          <div class="slide-num">01</div>
+          <div class="slide-title-wrap">
+            <div class="slide-kicker">Obsah prezentace</div>
+            <div class="slide-title">Co porovnáváme</div>
+          </div>
+        </div>
+        <div class="toc-grid" id="tocGrid">
+          <!-- filled by JS -->
+        </div>
+      </div>
+
+      <!-- ============ SLIDES 2–10: COMPARISON ============ -->
+      <!-- filled by JS -->
+
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="nav-bar">
+    <button class="nav-btn" id="btnPrev" onclick="go(-1)">
+      <span class="nav-arrow">←</span> Zpět
+    </button>
+    <button class="nav-btn primary" id="btnNext" onclick="go(1)">
+      Dále <span class="nav-arrow">→</span>
+    </button>
+  </div>
+
+</div>
+
+<script>
+const slides = [
+  null, // cover
+  null, // toc
+  {
+    num: '02',
+    tag: 'Základní rámec',
+    title: 'Název a předmět zákona',
+    intro: 'Nový zákon přijímá moderní terminologii — namísto „finanční kontroly" hovoří o „řízení a kontrole veřejných financí", čímž rozšiřuje záběr na celý systém, nejen kontrolní funkci.',
+    old: {
+      label: 'Zákon č. 320/2001 Sb.',
+      items: [
+        'Zákon <strong>o finanční kontrole</strong> ve veřejné správě',
+        'Zaměření pouze na kontrolní funkci',
+        'Vymezuje finanční kontrolu jako součást systému finančního řízení',
+        'Méně systematická struktura, opírala se z velké části o prováděcí vyhlášku',
+      ]
+    },
+    new: {
+      label: 'Zákon č. 231/2025 Sb.',
+      items: [
+        'Zákon <strong>o řízení a kontrole</strong> veřejných financí <span class="change-badge badge-changed">přejmenován</span>',
+        'Zahrnuje celé řízení veřejných financí, nejen kontrolu',
+        'Zapracovává příslušný předpis EU (čl. 3 odst. 1 směrnice 2011/85/EU)',
+        'Zásady jsou přímo v zákoně, nikoli ve vyhlášce <span class="change-badge badge-new">nové</span>',
+      ]
+    }
+  },
+  {
+    num: '03',
+    tag: 'Nový prvek',
+    title: 'Zákonné zásady řízení a kontroly',
+    intro: 'Zcela nová část zákona kodifikuje šest explicitních zásad. Dříve plynuly jen implicitně z praxe nebo ze starší vyhlášky č. 416/2004 Sb., která se nyní ruší.',
+    old: {
+      label: 'Zákon č. 320/2001 Sb.',
+      items: [
+        'Žádná samostatná část se zásadami',
+        'Hospodárnost, účelnost, efektivnost definovány v § 2 jako pojmy',
+        'Zásada oddělení funkcí zmíněna implicitně',
+        'Auditní stopa — jen praxe, nikoli zákonná povinnost',
+      ]
+    },
+    new: {
+      label: 'Zákon č. 231/2025 Sb.',
+      items: [
+        '<strong>§ 3 Řádné finanční řízení</strong> — přesnější definice 3E <span class="change-badge badge-new">nové</span>',
+        '<strong>§ 4 Spolupráce</strong> — sdílení výsledků kontrol <span class="change-badge badge-new">nové</span>',
+        '<strong>§ 5 Prevence</strong> — předcházení systémovým nedostatkům <span class="change-badge badge-new">nové</span>',
+        '<strong>§ 6 Posouzení rizik</strong> — risk-based přístup jako zákonná zásada <span class="change-badge badge-new">nové</span>',
+        '<strong>§ 7 Rozdělení práv a povinností</strong> — 4-oké oddělení <span class="change-badge badge-new">nové</span>',
+        '<strong>§ 8 Auditní stopa</strong> — povinnost uchovávat záznamy o VKS <span class="change-badge badge-new">nové</span>',
+      ]
+    }
+  },
+  {
+    num: '04',
+    tag: 'Řídicí kontrola',
+    title: 'Předběžná řídicí kontrola — nová role hlavního účetního',
+    intro: 'Struktura předběžné řídicí kontroly se zpřesňuje. Výdajová operace nově povinně prochází třemi osobami, přičemž role hlavního účetního je explicitně zakotvena přímo v zákoně.',
+    old: {
+      label: 'Zákon č. 320/2001 Sb.',
+      items: [
+        'Příkazce operace + správce rozpočtu + hlavní účetní',
+        'Podrobnosti upravovala vyhláška č. 416/2004 Sb.',
+        'Majetkové operace nebyly explicitně pokryty',
+        'Výjimky z předběžné kontroly — zjednodušeně',
+      ]
+    },
+    new: {
+      label: 'Zákon č. 231/2025 Sb.',
+      items: [
+        'Příjmová operace: příkazce + správce rozpočtu',
+        'Výdajová operace: příkazce + správce rozpočtu + <strong>hlavní účetní</strong> (přímo v zákoně) <span class="change-badge badge-changed">změna</span>',
+        '<strong>Majetkové operace</strong> — nově výslovně zahrnuty v § 11 odst. 2 <span class="change-badge badge-new">nové</span>',
+        'Sloučení funkcí příkazce a SR nebo HÚ je <strong>nepřípustné</strong>',
+        'Výjimky rozšířeny: humanitární pomoc, správa dluhu, záchranné systémy <span class="change-badge badge-changed">rozšířeno</span>',
+      ]
+    }
+  },
+  {
+    num: '05',
+    tag: 'Interní audit',
+    title: 'Interní audit — lhůty a celkový názor',
+    intro: 'Zákon nově stanovuje přesné lhůty průběhu auditu a zavádí povinný „celkový názor" na vnitřní kontrolní systém se čtyřstupňovou škálou. Odstraňuje se vágnost dosavadní úpravy.',
+    old: {
+      label: 'Zákon č. 320/2001 Sb.',
+      items: [
+        'Lhůty pro auditní zprávu nestanoveny zákonem',
+        'Žádný povinný celkový názor na VKS',
+        'Plány schvaloval vedoucí orgánu bez detailní úpravy',
+        'Roční zpráva IA bez standardizované struktury',
+      ]
+    },
+    new: {
+      label: 'Zákon č. 231/2025 Sb.',
+      items: [
+        'Návrh auditní zprávy: <strong>do 30 dnů</strong> (složité případy 60 dnů) <span class="change-badge badge-new">nové</span>',
+        'Auditovaná osoba: <strong>15 dnů</strong> na vyjádření k návrhu <span class="change-badge badge-new">nové</span>',
+        'Finální zpráva: do <strong>dalších 30/60 dnů</strong> od vyjádření <span class="change-badge badge-new">nové</span>',
+        '<strong>Celkový názor</strong> — povinná 4-stupňová škála kvality VKS <span class="change-badge badge-new">nové</span>',
+        'Standardizovaný obsah roční zprávy IA (§ 28 odst. 2) <span class="change-badge badge-changed">zpřesněno</span>',
+      ]
+    }
+  },
+  {
+    num: '06',
+    tag: 'Celkový názor',
+    title: 'Čtyřstupňová škála hodnocení VKS',
+    intro: 'Nový zákon zavádí povinný celkový názor útvaru interního auditu na vnitřní kontrolní systém. Škála je standardizovaná a srovnatelná mezi orgány.',
+    old: {
+      label: 'Zákon č. 320/2001 Sb.',
+      items: [
+        'Roční zpráva hodnotila VKS jen volně',
+        'Žádná standardizovaná škála',
+        'Obsah zprávy nebyl detailně předepsán',
+        'Srovnatelnost mezi orgány omezená',
+      ]
+    },
+    new: {
+      label: 'Zákon č. 231/2025 Sb. — § 28 odst. 3',
+      items: [
+        '🟢 <strong>Přiměřený a účinný</strong> — vše funguje správně',
+        '🟡 <strong>Potřebuje dílčí zlepšení</strong> — drobné nedostatky',
+        '🟠 <strong>Potřebuje významná zlepšení</strong> — systémové problémy',
+        '🔴 <strong>Není přiměřený nebo účinný</strong> — zásadní selhání',
+      ]
+    }
+  },
+  {
+    num: '07',
+    tag: 'Zcela nový institut',
+    title: 'Vrchní audit — nový nástroj MF',
+    intro: 'Zákon zavádí zcela nový institut — vrchní audit vykonávaný útvarem Ministerstva financí. Nemá přímý ekvivalent ve starém zákoně. Cílí na systémovou kvalitu VKS na celostátní úrovni.',
+    old: {
+      label: 'Zákon č. 320/2001 Sb.',
+      items: [
+        'MF vykonávalo veřejnosprávní kontrolu u OSS a státních fondů',
+        'Koordinační a metodická role MF (§ 7)',
+        'Žádný nástroj pro audit VKS u OSS',
+        'Výsledky šly přímo k vedoucímu kontrolované osoby',
+      ]
+    },
+    new: {
+      label: 'Zákon č. 231/2025 Sb. — § 29–30',
+      items: [
+        '<strong>Vrchní audit</strong> — nový institut bez předchůdce <span class="change-badge badge-new">zcela nové</span>',
+        'Prověřuje dodržování zákona + přiměřenost VKS u OSS, SF, státní PO, SŽDC',
+        'Auditní zpráva jde auditované osobě <strong>a ministru financí</strong>',
+        'Nevztahuje se na zpravodajské služby, NKÚ, Kanceláře, ÚS',
+        'Plánování: střednědobý + roční plán, schvaluje ministr',
+      ]
+    }
+  },
+  {
+    num: '08',
+    tag: 'Interní audit — organizace',
+    title: 'Povinnost externího hodnocení kvality IA',
+    intro: 'Zcela nová zákonná povinnost: orgány veřejné správy musí nejméně jednou za 5 let zajistit externí hodnocení kvality svého interního auditu. Výsledky předávají Ministerstvu financí.',
+    old: {
+      label: 'Zákon č. 320/2001 Sb.',
+      items: [
+        'Žádná povinnost externího hodnocení IA',
+        'Kvalita IA závisela jen na vedoucím orgánu',
+        'MF nemělo systematické informace o kvalitě IA',
+        'Mezinárodní standardy IA zmíněny, ale bez mechanismu ověření',
+      ]
+    },
+    new: {
+      label: 'Zákon č. 231/2025 Sb. — § 26–27',
+      items: [
+        'Povinné <strong>externí hodnocení kvality IA</strong> alespoň 1× za 5 let <span class="change-badge badge-new">nové</span>',
+        'Ústřední orgány státní správy: MF nebo auditorská společnost',
+        'Zpráva z hodnocení + přehled opatření → MF do 2 měsíců',
+        'Orgán přijme opatření ke zvyšování kvality IA',
+        'Výjimka: zpravodajské služby',
+      ]
+    }
+  },
+  {
+    num: '09',
+    tag: 'Koordinace kontrol',
+    title: 'Povinná koordinace kontrol — konec souběhů',
+    intro: 'Zcela nová část zákona (§ 37–38) zavádí povinnou koordinaci kontrol veřejné finanční podpory. Cílem je eliminovat situace, kdy je jeden příjemce kontrolován více orgány současně bez důvodu.',
+    old: {
+      label: 'Zákon č. 320/2001 Sb.',
+      items: [
+        'Spolupráce jen obecně zmíněna v § 23',
+        'Žádný mechanismus koordinace plánů kontrol',
+        'Souběh kontrol byl v praxi běžný problém',
+        'Využívání výsledků jiných orgánů nebylo zákonnou povinností',
+      ]
+    },
+    new: {
+      label: 'Zákon č. 231/2025 Sb. — § 37–38',
+      items: [
+        '<strong>IS pro koordinaci kontrol MF</strong> — vkládání plánů kontrol <span class="change-badge badge-new">nové</span>',
+        'Povinní účastníci: poskytovatelé dotací, EU fondy, ÚOHS, finanční správa',
+        'Koordinace s cílem <strong>předcházet neodůvodněnému souběhu</strong>',
+        'Povinnost využívat výsledky kontrol jiných orgánů <span class="change-badge badge-new">nové</span>',
+        'Odchýlení od závěrů jiného orgánu = nutnost <strong>odůvodnění</strong>',
+      ]
+    }
+  },
+  {
+    num: '10',
+    tag: 'Reporting',
+    title: 'Roční zprávy — nová struktura a lhůty',
+    intro: 'Roční zprávy se zjednodušují a unifikují. Namísto oddělených zpráv o výsledcích FK vzniká jedna komplexní zpráva o řízení a kontrole VF s jasnou strukturou a pevným termínem.',
+    old: {
+      label: 'Zákon č. 320/2001 Sb.',
+      items: [
+        'Roční zpráva o výsledcích finanční kontroly (§ 22)',
+        'Termín: součást návrhu státního závěrečného účtu (neurčité)',
+        'Závažné zjištění (nad 300 000 Kč) → MF do 1 měsíce',
+        'Obsah: výsledky kontrol + přehled zjištění',
+      ]
+    },
+    new: {
+      label: 'Zákon č. 231/2025 Sb. — § 39',
+      items: [
+        '<strong>Roční zpráva o řízení a kontrole VF</strong> — nový název a struktura <span class="change-badge badge-changed">změna</span>',
+        'Pevný termín: <strong>do 1. března</strong> následujícího roku <span class="change-badge badge-changed">zpřesněno</span>',
+        'Obsah: stav VKS + celkový názor + IA + výsledky VSK',
+        'MF předkládá vládě souhrnnou zprávu do <strong>30. dubna</strong>',
+        'Informace z monitorovacích systémů EU se nevykazují zvlášť <span class="change-badge badge-new">nové</span>',
+      ]
+    }
+  },
+
+    ];
+
+  let current = 0;
+  const total = slides.length;
+
+  const tocTitles = [
+    'Přehled změn — úvod',
+    'Obsah prezentace',
+    'Název a předmět zákona',
+    'Nové zákonné zásady',
+    'Řídicí kontrola & hlavní účetní',
+    'Interní audit — lhůty',
+    'Celkový názor na VKS',
+    'Vrchní audit (nový institut)',
+    'Ext. hodnocení kvality IA',
+    'Koordinace kontrol',
+    'Roční zprávy',
+  ];
+
+  function buildToc() {
+    const grid = document.getElementById('tocGrid');
+    tocTitles.slice(2).forEach((t, i) => {
+      const item = document.createElement('div');
+      item.className = 'toc-item';
+      item.onclick = () => goTo(i + 2);
+      item.innerHTML = `<div class="toc-num">${i + 1}</div><div class="toc-text">${t}</div>`;
+      grid.appendChild(item);
+    });
+  }
+
+  function buildCompSlides() {
+    const track = document.getElementById('slidesTrack');
+    slides.slice(2).forEach((s, i) => {
+      const div = document.createElement('div');
+      div.className = 'slide slide-comparison';
+      div.innerHTML = `
+        <div class="comp-header">
+          <div class="slide-num">${s.num}</div>
+          <div class="slide-title-wrap">
+            <div class="slide-kicker"><span class="section-tag">${s.tag}</span></div>
+            <div class="slide-title">${s.title}</div>
+          </div>
+        </div>
+        <div class="comp-body">
+          <div class="comp-intro">${s.intro}</div>
+          <div class="comp-row">
+            <div class="comp-col old-col">
+              <div class="col-label old">${s.old.label}</div>
+              <div class="col-content"><ul>${s.old.items.map(x => `<li>${x}</li>`).join('')}</ul></div>
+            </div>
+            <div class="comp-col new-col">
+              <div class="col-label new">${s.new.label}</div>
+              <div class="col-content"><ul>${s.new.items.map(x => `<li>${x}</li>`).join('')}</ul></div>
+            </div>
+          </div>
+        </div>
+      `;
+      track.appendChild(div);
+    });
+  }
+
+  function buildDots() {
+    const container = document.getElementById('progressDots');
+    for (let i = 0; i < total; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'p-dot';
+      dot.setAttribute('data-title', tocTitles[i] || '');
+      dot.onclick = () => goTo(i);
+      container.appendChild(dot);
+    }
+  }
+
+  function updateUI() {
+    // Track
+    const track = document.getElementById('slidesTrack');
+    track.style.transform = `translateX(-${current * 100}%)`;
+
+    // Progress fill
+    const pct = total > 1 ? (current / (total - 1)) * 100 : 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+
+    // Count
+    document.getElementById('progressCount').textContent = `${current + 1} / ${total}`;
+
+    // Dots
+    document.querySelectorAll('.p-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+      d.classList.toggle('visited', i < current);
+    });
+
+    // Buttons
+    document.getElementById('btnPrev').disabled = current === 0;
+    document.getElementById('btnNext').disabled = current === total - 1;
+
+    if (current === 0) {
+      document.getElementById('btnNext').textContent = 'Zahájit  →';
+    } else if (current === total - 1) {
+      document.getElementById('btnNext').innerHTML = 'Konec prezentace';
+    } else {
+      document.getElementById('btnNext').innerHTML = 'Dále <span class="nav-arrow">→</span>';
+    }
+  }
+
+  function go(dir) {
+    goTo(current + dir);
+  }
+
+  function goTo(idx) {
+    if (idx < 0 || idx >= total) return;
+    current = idx;
+    updateUI();
+  }
+
+  // Keyboard
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') go(-1);
+  });
+
+  // Touch
+  let touchStart = null;
+  document.querySelector('.slides-viewport').addEventListener('touchstart', e => {
+    touchStart = e.touches[0].clientX;
+  });
+  document.querySelector('.slides-viewport').addEventListener('touchend', e => {
+    if (touchStart === null) return;
+    const diff = touchStart - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) go(diff > 0 ? 1 : -1);
+    touchStart = null;
+  });
+
+  // Init
+  buildToc();
+  buildCompSlides();
+  buildDots();
+  updateUI();
+</script>
+</body>
+</html>
